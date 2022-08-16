@@ -21,6 +21,7 @@ module.exports = {
     
     tokens: tokens,
     testConfig: {
+        agentAddr: "0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1",
         addr: "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
         addr1: "0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199",
         contractAddr: "0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1",
@@ -51,7 +52,9 @@ module.exports = {
         "function borrowBalanceStored(address account) public view returns (uint)",
         "function repayAndredeem(address borrowAddr, address redeemAddr) external payable",
         "function repayBehalf(address borrower) public payable",
-        "function redeem(uint redeemTokens) external returns (uint)"
+        "function redeem(uint redeemTokens) external returns (uint)",
+        "function createAgent() external",
+        "function getAgent() external view returns (address)"
     ],
     webTokens: ["0xF2001B145b43032AAF5Ee2884e456CCd805F677D", "0xc21223249CA28397B4B6541dfFaEcC539BfF0c59"]
 

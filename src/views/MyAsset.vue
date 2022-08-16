@@ -95,6 +95,20 @@ import { ethers } from "ethers";
     //   this.totalRows = this.items.length
     // },
     methods: {
+      async getAgent(){
+          const { ethereum } = window
+          const provider = new ethers.providers.Web3Provider(ethereum);
+          const signer = await provider.getSigner()
+          const contract = new ethers.Contract( testConfig.agentAddr,
+              tokenABI,
+              signer
+          );
+          if(window.agentAddr){
+              return window.agentAddr;
+          }
+          window.agentAddr = await contract.getAgent();  
+          return window.agentAddr ;
+      },
       async redeem(row){
           console.log(row.item.Address);
 
@@ -128,14 +142,17 @@ import { ethers } from "ethers";
         const signer = await provider.getSigner();
 
         const tonicContract = new ethers.Contract(testConfig.tonicSocketAddr,tokenABI,signer);
-        const assetIn =await tonicContract.getAssetsIn(testConfig.contractAddr);
+
+        const agentAddr = await this.getAgent();
+        const assetIn =await tonicContract.getAssetsIn(agentAddr);
+
         console.log("getAssetsIn", assetIn);
 
         for (var i = 0; i < assetIn.length; i++) {
 
           const assetContract = new ethers.Contract(assetIn[i],tokenABI,signer);
 
-          const balance = await assetContract.balanceOf(testConfig.contractAddr);
+          const balance = await assetContract.balanceOf(agentAddr);
           const symbol = await assetContract.symbol();
           const obj = {};
           obj.Address = assetIn[i];

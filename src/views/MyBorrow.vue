@@ -100,6 +100,20 @@ import { ethers } from "ethers";
     //   this.totalRows = this.items.length
     // },
     methods: {
+      async getAgent(){
+          const { ethereum } = window
+          const provider = new ethers.providers.Web3Provider(ethereum);
+          const signer = await provider.getSigner()
+          const contract = new ethers.Contract( testConfig.agentAddr,
+              tokenABI,
+              signer
+          );
+          if(window.agentAddr){
+              return window.agentAddr;
+          }
+          window.agentAddr = await contract.getAgent();  
+          return window.agentAddr ;
+      },
       async mint(row){
         // alert(JSON.stringify(row.item.Balance));
         const { ethereum } = window
@@ -136,7 +150,8 @@ import { ethers } from "ethers";
           );
 
         // console.log(contract);
-        const balance = await contract.borrowBalanceStored( testConfig.contractAddr);
+        const agentAddr = await this.getAgent();
+        const balance = await contract.borrowBalanceStored( agentAddr);
         const symbol = await contract.symbol();
         list.push({showApprove: false, Approve: false,Address: testConfig.borrowAddr,  Symbol: symbol, Balance: balance.toString(), isEnabled: false});
 

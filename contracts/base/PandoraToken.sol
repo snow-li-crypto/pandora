@@ -6,4 +6,5 @@ contract PandoraToken is ERC20("Pandora", "PAN"){
     
     // mapping(address=>uint) public receiveAccount ;
 
+    address owner;
 }

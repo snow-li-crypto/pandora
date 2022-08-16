@@ -13,6 +13,15 @@ import "./storage/SwapStorage.sol";
 contract PandoraCore is TTokenStorage, PandoraToken, Lock, SwapStorage {
     using SafeMath for uint;
 
+    constructor(address owner_){
+        owner = owner_;
+    }
+
+    modifier onlyOwner(){
+        require(msg.sender == owner, "invaild sender");
+        _;
+    }
+
     /**
      *
      */
@@ -20,7 +29,7 @@ contract PandoraCore is TTokenStorage, PandoraToken, Lock, SwapStorage {
         address marketToken,
         address borrowTtoken,
         uint amount
-    ) external lock {
+    ) external lock  onlyOwner{
         address tTokenAddr = marketTtokenMapping[marketToken];
         require(tTokenAddr != address(0), "invaild marketToken");
         require(amount > 0, "invaild amount");
@@ -99,6 +108,7 @@ contract PandoraCore is TTokenStorage, PandoraToken, Lock, SwapStorage {
         external
         payable
         lock
+        onlyOwner
     {
         require(msg.value > 0, "invalid msg.value");
 

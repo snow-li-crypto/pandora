@@ -1,4 +1,5 @@
 const { ethers } = require('hardhat');
+const { testConfig} = require('../test/mock/config');
 
 async function deployContract(contractName){
     const contractFactory = await ethers.getContractFactory(contractName)
@@ -9,7 +10,9 @@ async function deployContract(contractName){
 
 const main = async() => {
     // await deployContract("ShortSale");
-    await deployContract("PandoraCore");
+    // await deployContract("PandoraCore");
+
+    await deployContract("PandoraAgent");
 }
 const runMain = async() => {
     try {

@@ -25,6 +25,8 @@
         <!-- <b-button size="sm"  class="mr-1" >
           Approve
         </b-button> -->
+        <b-button variant="primary" @click="enterMarket(row)"  :disabled=row.item.EnterMarket>EnterMarket</b-button>
+        &nbsp;&nbsp;
         <b-button variant="primary" @click="approve(row)" :disabled=!row.item.showApprove>Approve</b-button>
         &nbsp;&nbsp;
         <b-button variant="warning" :disabled=!row.item.Approve @click="mint(row)">Mint</b-button>
@@ -60,6 +62,7 @@ import { ethers } from "ethers";
   export default {
     data() {
       return {
+        agentAddr: '',
         items: [
           // { isActive: true, Symbol: 40, Address: "addr", Balance: 30 , isEnabled: true},
         ],
@@ -110,6 +113,8 @@ import { ethers } from "ethers";
       async redeem(row){
           console.log(row);
 
+          const agentAddr = await this.getAgent();
+
           const { ethereum } = window
           const provider = new ethers.providers.Web3Provider(ethereum);
           const signer = await provider.getSigner()
@@ -117,13 +122,13 @@ import { ethers } from "ethers";
               tokenABI,
               signer
             );  
-          var bowrrowAmount =  await contract.borrowBalanceStored(testConfig.contractAddr);  
+          var bowrrowAmount =  await contract.borrowBalanceStored(agentAddr);  
           console.log("bowrrowAmount: ", bowrrowAmount.toString());
           const amount = ethers.utils.parseUnits("5", 16);
           bowrrowAmount = bowrrowAmount.add(amount);
           console.log("bowrrowAmount: ", bowrrowAmount.toString());
 
-          const repayContract = new ethers.Contract( testConfig.contractAddr,
+          const repayContract = new ethers.Contract( agentAddr,
               tokenABI,
               signer
             );
@@ -134,10 +139,14 @@ import { ethers } from "ethers";
       },  
       async mint(row){
         // alert(JSON.stringify(row.item.Balance));
+        const agentAddr = await this.getAgent();
+
+        console.log(agentAddr);
+
         const { ethereum } = window
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = await provider.getSigner()
-        const contract = new ethers.Contract( testConfig.contractAddr,
+        const contract = new ethers.Contract( agentAddr,
             tokenABI,
             signer
           );
@@ -174,8 +183,23 @@ import { ethers } from "ethers";
         // await tokenContract.approve(testConfig.addr, amount);
         // await tokenContract.transfer(testConfig.addr, amount);
       },
+      async enterMarket(){
+          // console.log(row);
+          const { ethereum } = window
+          const provider = new ethers.providers.Web3Provider(ethereum);
+          const signer = await provider.getSigner()
+          const contract = new ethers.Contract( testConfig.agentAddr,
+              tokenABI,
+              signer
+          );  
+          await contract.createAgent();
+          // window.agentAddr = await contract.getAgent();
+      },
       async approve(row){
-        // alert(JSON.stringify(row.item.Balance));
+        // console.log(row.item.Balance);
+        // console.log(await this.getAgent());
+        const agentAddr = await this.getAgent();
+        console.log(agentAddr);
         const { ethereum } = window
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = await provider.getSigner()
@@ -183,7 +207,21 @@ import { ethers } from "ethers";
             tokenABI,
             signer
           );
-        await contract.approve(testConfig.contractAddr, row.item.Balance);
+        await contract.approve(agentAddr, row.item.Balance);
+      },
+      async getAgent(){
+          const { ethereum } = window
+          const provider = new ethers.providers.Web3Provider(ethereum);
+          const signer = await provider.getSigner()
+          const contract = new ethers.Contract( testConfig.agentAddr,
+              tokenABI,
+              signer
+          );
+          // if(window.agentAddr){
+          //     return window.agentAddr;
+          // }
+          window.agentAddr = await contract.getAgent();  
+          return window.agentAddr ;
       },
       async loadData() {
         const { ethereum } = window
@@ -193,6 +231,16 @@ import { ethers } from "ethers";
 
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = await provider.getSigner()
+
+        const agentContract = new ethers.Contract(testConfig.agentAddr,
+            tokenABI,
+            signer
+          );
+        const agentAddr = await agentContract.getAgent();
+        console.log("agentAddr: ", agentAddr);
+        const enterMarket = agentAddr != "0x0000000000000000000000000000000000000000";
+        console.log("enterMarket: ", enterMarket);
+
         for (var i = 0; i < tokens.length; i++) {
           const obj = { Address: tokens[i] };
           // console.log(signer);
@@ -204,19 +252,22 @@ import { ethers } from "ethers";
           const balance = await contract.balanceOf( testConfig.addr);
           const symbol = await contract.symbol();
 
-          const allowance = await contract.allowance(testConfig.addr, testConfig.contractAddr);
-          if(balance > 1 && allowance > 0){
+          const agentAddr = await this.getAgent();
+
+          const allowance = await contract.allowance(testConfig.addr, agentAddr);
+          if(balance > 1 && allowance > 0 ){
               obj.Approve = true;
           }else{
             obj.Approve = false;
           }
-          if(balance > 0 && allowance <= 0){
+          if(balance > 0 && allowance <= 0 && enterMarket){
             obj.showApprove = true;
           }else{
             obj.showApprove = false;
           }
           obj.Balance = balance;
           obj.Symbol = symbol;
+          obj.EnterMarket = enterMarket;
           // obj.Approve = false;
           console.log(balance.toString());
           list.push(obj);
