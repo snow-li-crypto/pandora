@@ -30,9 +30,12 @@ npx hardhat compile
     npx hardhat node --fork https://evm-cronos.crypto.org
     ```
 
-2. Open a new terminal and deploy smart contract in the `localhost` network
+2. Open a new terminal execute the following script
     ```
-    npx hardhat run --network localhost scripts/deploy.js
+    2.1 deploy smart contract:
+        npx hardhat run --network localhost scripts/deploy.js
+    2.2 Test address recharge
+        npx hardhat run --network localhost test/mock/transfer2.js    
     ```
 
 

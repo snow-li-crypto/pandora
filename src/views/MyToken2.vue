@@ -223,9 +223,8 @@ import { ethers } from "ethers";
         }
 
         // const contractSigner = await provider.getSigner(testConfig.contractAddr)
-        const b1 = await provider.getBalance(testConfig.contractAddr);
-        
-        list.push({showApprove: false, Approve: false,Address: testConfig.contractAddr,  Symbol: "CRO", Balance: b1.toString(), isEnabled: false});
+        // const b1 = await provider.getBalance(testConfig.contractAddr);
+        // list.push({showApprove: false, Approve: false,Address: testConfig.contractAddr,  Symbol: "CRO", Balance: b1.toString(), isEnabled: false});
 
 
         return list;
